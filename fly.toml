@@ -1,0 +1,46 @@
+# fly.toml - Fly.io deployment configuration
+# Deploy with: fly launch / fly deploy
+
+app = "whisper-chat"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  SSH_PORT = "2222"
+  P2P_PORT = "4001"
+  SSH_HOST_KEY_PATH = "/app/keys/host.key"
+  DEFAULT_ROOM = "lobby"
+  MAX_MESSAGE_SIZE = "4096"
+  RATE_LIMIT = "10"
+  LOG_LEVEL = "info"
+
+# SSH port - TCP passthrough for raw SSH connections
+[[services]]
+  internal_port = 2222
+  protocol = "tcp"
+
+  [[services.ports]]
+    port = 2222
+
+# P2P WebSocket port
+[[services]]
+  internal_port = 4001
+  protocol = "tcp"
+
+  [[services.ports]]
+    port = 4001
+
+# Persistent storage for SSH host key
+[mounts]
+  source = "whisper_keys"
+  destination = "/app/keys"
+
+# Health check (basic TCP check)
+[[services.tcp_checks]]
+  grace_period = "10s"
+  interval = "30s"
+  restart_limit = 3
+  timeout = "5s"
