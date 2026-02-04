@@ -42,5 +42,5 @@ ENV SSH_HOST_KEY_PATH=/app/keys/host.key
 # Expose ports
 EXPOSE 2222 4001
 
-# Run the server
-CMD ["node", "dist/index.js", "server"]
+# Generate host key if not exists, then run the server
+CMD ["sh", "-c", "if [ ! -f /app/keys/host.key ]; then node dist/scripts/generate-host-key.js /app/keys/host.key; fi && node dist/index.js server"]
